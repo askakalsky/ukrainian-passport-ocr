@@ -109,6 +109,10 @@ def recognize(image: np.ndarray, model: SequenceCNN,
     arr = img.astype(np.float32) / 255.0
     x   = torch.tensor(arr).unsqueeze(0).unsqueeze(0)   # (1, 1, H, W)
 
+    # Match model dtype (FP32 / FP16)
+    model_dtype = next(model.parameters()).dtype
+    x = x.to(model_dtype)
+
     with torch.no_grad():
         logits = model(x)[0]   # (8, n_classes)
 
