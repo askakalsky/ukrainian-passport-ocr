@@ -86,14 +86,20 @@ print(result["readable"])    # True
 
 ## Models
 
-| Model | Architecture | Purpose |
-|-------|-------------|---------|
-| `models/detector.pt` | YOLOv8n fine-tuned | Locates the dotted strip on the passport page |
-| `models/recognizer.pth` | CNN + biGRU | Reads the 8-character string from the strip |
+| File | Architecture | Size | Purpose |
+|------|-------------|------|---------|
+| `models/detector.pt` | YOLO nano fine-tuned | 5.95 MB | Locates the dotted strip on the passport page |
+| `models/recognizer.pth` | CNN + biGRU (FP32) | 2.25 MB | Reads the 8-character string from the strip |
+| `models/recognizer_fp16.pth` | CNN + biGRU (FP16) | **1.13 MB** | Same accuracy, 2× smaller — recommended for deployment |
+
+To use the FP16 model:
+```python
+ocr = PassportOCR(recognizer_path="models/recognizer_fp16.pth")
+```
 
 The recognizer is trained on **80 000 synthetic images** generated with a custom dot-matrix Cyrillic font, with heavy augmentation (rotation ±20°, perspective, noise, donut dots, shadow stripes, inversion).
 
-Val character accuracy: **96.1%** | Full-string accuracy on real passports: **~95%**
+Val character accuracy: **96.1%** | Full-string accuracy on real passports: **96%**
 
 ---
 
@@ -120,8 +126,31 @@ The model enforces positional constraints: positions 0–1 accept only series le
 
 ---
 
+## Custom fonts & datasets
+
+The `train/font_editor.py` tool lets you define your own dot-matrix font for any character set:
+
+- Add / remove any Unicode character
+- Set any grid size per character (cols × rows, independently)
+- Save to `font_custom.json`, export to `font_custom.py`
+
+```bash
+cd train
+python font_editor.py                      # edit default font
+python font_editor.py --font myfont.json   # open a different font file
+```
+
+After editing, regenerate synthetic data and retrain:
+```bash
+python generate_sequences.py --n-samples 80000
+python train_sequence.py --epochs 35
+```
+
+---
+
 ## Limitations
 
 - Works on Ukrainian **internal** passports (старого зразка, до 2016 року)
 - Requires the dot-matrix strip to be visible and not heavily physically damaged
 - Very low contrast or extreme blur may result in `readable: False`
+- Low-confidence predictions (< 50%) are flagged — the raw image may be unreadable
