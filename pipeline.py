@@ -90,7 +90,7 @@ class PassportOCR:
                 "error":      "ROI not detected",
             }
 
-        roi_crop = crop_roi(img_bgr, box, padding=0.05)
+        roi_crop = crop_roi(img_bgr, box, padding=0.0)
 
         # -- Preprocess --------------------------------------------------------
         roi_clean = preprocess(roi_crop)
@@ -127,7 +127,7 @@ def _show_result(img_bgr: np.ndarray, result: dict) -> None:
     axes[0].axis("off")
 
     if box:
-        roi = crop_roi(img_bgr, box, padding=0.05)
+        roi = crop_roi(img_bgr, box, padding=0.0)
         roi_clean = preprocess(roi)
         axes[1].imshow(roi_clean, cmap="gray")
         label = result.get("full") or "NOT DETECTED"

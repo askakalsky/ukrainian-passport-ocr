@@ -46,4 +46,9 @@ def preprocess(image: np.ndarray) -> np.ndarray:
     _, binary = cv2.threshold(enhanced, 0, 255,
                                cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
+    # Invert if background is dark (dots should be white on black,
+    # matching the original Step_5_Binary preprocessing)
+    if binary.mean() > 127:
+        binary = 255 - binary
+
     return binary
