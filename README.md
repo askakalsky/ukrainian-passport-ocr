@@ -1,3 +1,19 @@
+---
+language:
+  - uk
+license: mit
+tags:
+  - ocr
+  - object-detection
+  - image-classification
+  - passport
+  - ukraine
+  - crnn
+  - yolo
+  - dot-matrix
+pipeline_tag: image-to-text
+---
+
 # Ukrainian Passport Series/Number OCR
 
 Automatic recognition of the series and number from Ukrainian internal passports (старого зразка).
